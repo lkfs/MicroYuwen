@@ -1,0 +1,111 @@
+body {
+    padding: 2px !important;
+    margin: 0 !important;
+    /*background: white !important;*/
+}
+
+.table {
+    background: white !important;
+    border-collapse: collapse;
+    padding: 0 !important;
+    /*margin: 0 !important;*/
+    /*margin-left: 3px;*/
+    width: 100%;
+    border-bottom: 1px solid silver
+}
+
+.table > thead > tr > th {
+    vertical-align: middle !important;
+    border-bottom: 2px solid #dddddd;
+    cursor: default;
+    white-space: nowrap;
+}
+
+.table > tbody > tr > td {
+    vertical-align: middle !important;
+    white-space: nowrap;
+}
+
+.panel_title {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-right: 10px;
+    background-color: white;
+}
+
+#blackJack {
+    /*overflow: hidden !important;*/
+}
+
+#blackJack_modal_title {
+    padding-left: 15px !important;
+    font-size: 1.6rem !important;
+    font-weight: bold !important;
+}
+
+#blackJack_modal_body {
+    padding-left: 0 !important;
+    padding-right: 40px !important;
+}
+
+.if_list_div {
+    vertical-align: middle;
+    /*height: 36px;*/
+    line-height: 36px;
+    /*border-top: 0.1px solid #dfdfdf;*/
+}
+
+.if_list_div div {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.if_left_border {
+    border-left: 1px dashed #dddddd;
+}
+
+.if_right_border {
+    border-right: 1px dashed #dddddd;
+}
+
+.middle {
+    /*float: none;*/
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.float_right {
+    float: right;
+}
+
+.p_0 {
+    padding: 0 !important;
+}
+
+.pl-0 {
+    padding-left: 0 !important;
+}
+
+.pl_15 {
+    padding-left: 15px !important;
+}
+
+.pl_40 {
+    padding-left: 40px !important;
+}
+
+.pr-0 {
+    padding-right: 0 !important;
+}
+
+.pt_6 {
+    padding-top: 6px !important;
+}
+
+.mr_8 {
+    margin-right: 8px !important;
+}
+
+.ml_40 {
+    margin-left: 40px !important;
+}

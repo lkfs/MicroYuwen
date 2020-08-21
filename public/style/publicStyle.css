@@ -1,0 +1,189 @@
+html{
+    /*height: 100%;*/
+}
+body{
+    /*height: 100%;*/
+    color: #333333;
+    font-size: 14px !important;
+    /*background: #DEDEDE;*/
+    background: -webkit-linear-gradient(-90deg, rgba(222,222,222,1),rgba(240,240,240,1));
+    background:-moz-linear-gradient(-90deg, rgba(222,222,222,1),rgba(255,255,255,1));
+    background: -ms-linear-gradient(-90deg, rgba(222,222,222,1),rgba(255,255,255,1));
+    /*ie7 8 9;*//*(1是横向0是纵向)*/
+    filter: progid:DXImageTransform.Microsoft.Gradient(startColorStr='#DEDEDE',endColorStr='#ffffff',gradientType=0);
+    box-sizing: border-box;
+    padding-bottom: 200px;
+    position: relative;
+    min-height: 100vh;
+}
+body *{
+    font-size: 14px !important;
+}
+label.error{color: red}
+span.help-block{color: red}
+a{
+    /*color: #333333;*/
+    text-decoration: none;
+    cursor: pointer;
+}
+a:hover,a:active,a:visited,a:link{
+    /*color: #333333;*/
+    text-decoration: none;
+}
+li{
+    list-style: none;
+}
+.layout_flex{
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex !important;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+    -webkit-justify-content: center;
+}
+.propUpHeight:before, .propUpHeight:after{
+    display: block;
+    content: " ";
+}
+.propUpHeight:after{
+    clear: both;
+}
+.padding0{
+    padding: 0 !important;
+}
+.padding5{
+    padding: 5px !important;
+}
+.padding10{
+    padding: 10px !important;
+}
+.padding15{
+    padding: 15px !important;
+}
+.box_3d{
+    transform-style: preserve-3d;
+    perspective: 800px;
+    perspective-origin: 50% 50%;
+    /*z-index: 5;*/
+    backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;
+}
+.ellipsis{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.gesture{
+    cursor: pointer;
+}
+.notAllowed{
+    cursor: not-allowed;
+}
+.marginTop10{
+    margin-top: 10px;
+}
+.checkboxbadge{
+    float: right;
+    display: inline-block;
+    min-width: 10px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    background-color: #777;
+    border-radius: 10px;
+}
+.panel-title .badge{
+    float: right;
+}
+.backgroundImage_center{
+    background-repeat:no-repeat;
+    /*background-attachment:fixed;*/
+    background-position:center;
+    background-size: contain;
+}
+.absoluteBox{
+    position: absolute;
+    top:0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+}
+
+
+/*等待动画*/
+#waitingBox{
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(0,0,0,.5);
+    z-index: 999999;
+}
+#waitingBox .spin {
+    transform: rotate(360deg);
+    animation: spin 1.5s linear infinite;
+}
+@keyframes spin {
+    from {transform: rotate(0deg);}
+    to {transform: rotate(360deg);}
+}
+/* IE6-IE9实现 */
+#waitingBox .loading {
+    width: 32px; height: 32px;
+    background: url("../images/loading-css3.gif");
+    position: absolute;
+    top: 50%;
+    left: 50%;
+}
+/* IE10+ and other */
+#waitingBox #validInput:valid+.loading{
+    width: 3px; height:3px;
+    border-radius: 100%;                      /* 圆角 */
+    box-shadow: 0 -30px 0 5px #333,           /* 上, 1px 扩展 */
+    30px 0px 0 0px #333,                /* 右 */
+    0 30px 0 1px #333,                  /* 下 */
+    -30px 0 0 3px #333,                 /* 左 */
+
+    -21px -21px 0 4px #333,        /* 左上, 0.5px扩展 */
+    21px -21px 0 5px #333,        /* 右上, 1.5px扩展 */
+    21px 21px 0 0.5px #333,                 /* 右下 */
+    -21px 21px 0 2px #333;                /* 左下 */
+    background: none;
+}
+#waitingBox #validInput {
+    display: none;
+}
+/*输入框内简介样式*/
+input::-webkit-input-placeholder,textarea::-webkit-input-placeholder { color:#888888; font-size: 12px }     /*谷歌*/
+input::-moz-placeholder,textarea::-moz-placeholder { color:#888888; font-size: 12px }                  /*火狐*/
+input:-ms-input-placeholder,textarea:-ms-input-placeholder { color:#888888; font-size: 12px }          /*ie*/
+
+#showBigImg{
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,.5);
+    cursor: zoom-out;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+#showBigImg>img{
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+    margin: auto;
+    padding: 5px;
+    position: absolute;
+    top:0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
