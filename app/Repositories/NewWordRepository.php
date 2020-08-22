@@ -10,30 +10,14 @@ use stdClass;
  * 生字表
  * @package App\Repositories
  */
-class NewWordsRepository
+class NewWordRepository extends BaseRepository
 {
-    public $grades;
-    public $terms;
-    private $newWords;
+    public $newWords;
     /**
      * NewWords constructor.
      */
     public function __construct()
     {
-        $this->grades = array(
-            1=>'一年级',
-            2=>'二年级',
-            3=>'三年级',
-            4=>'四年级',
-            5=>'五年级',
-            6=>'六年级',
-        );
-
-        $this->terms = array(
-          0=>'上学期',
-          1=>'下学期',
-        );
-
         $this->newWords[10] = array(
             '一(yī)', '二(èr)', '三(sān)',
             '十(shí)', '木(mù)', '禾(hé)',
@@ -341,7 +325,6 @@ class NewWordsRepository
             }
             $this->newWords[$key] = $rtn;
         }
-        //dd($this->newWords);
     }
 
     /**
@@ -455,7 +438,7 @@ class NewWordsRepository
     {
         $a = file('/home/vagrant/abb.local/newword.txt');
         $start = false;
-        $newWords = new NewWordsRepository();
+        $newWords = new NewWordRepository();
         foreach($a as $line => $content){
             $pattern = '/([一二三四五六]年级[上下]册)生字/u';
             $count = preg_match($pattern, $content, $matches);

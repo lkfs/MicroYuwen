@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\NewWordsRepository;
+use App\Models\MNewWord;
+use App\Repositories\NewWordRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
-class NewWordsController extends Controller
+class NewWordController extends Controller
 {
     private $repository;
     /**
      * NewWordsController constructor.
      */
-    public function __construct(NewWordsRepository $_repository)
+    public function __construct(NewWordRepository $_repository)
     {
         $this->repository = $_repository;
     }
@@ -23,7 +25,18 @@ class NewWordsController extends Controller
      */
     public function index()
     {
-        //
+        /* 生词表入库
+        foreach ($this->repository->newWords as $key=>$list){
+            foreach ($list as $word=>$pinyin){
+                $newWord = new MNewWord();
+                $newWord->word = $word;
+                $newWord->pinyin = $pinyin;
+                $newWord->grade = floor($key / 10);
+                $newWord->term = $key % 10;
+                Log::info('$word = '.$newWord.', $pinyin = '.$pinyin.json_encode($newWord));
+                $newWord->save();
+            }
+        }*/
     }
 
     /**

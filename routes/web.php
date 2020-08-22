@@ -15,4 +15,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::resource('newWords', 'NewWordsController');
+Route::resource('newWords', 'NewWordController');
+Route::resource('wordGroups', 'WordGroupController');
+Route::resource('articles', 'ArticleController');
