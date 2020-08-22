@@ -16,30 +16,29 @@ use stdClass;
  */
 class WordGroupRepository extends BaseRepository
 {
-
-
     public function make(){
         $newWords = MNewWord::orderBy('grade')
-            ->orderBy('term')
-            ->limit(3)
+            ->orderBy('term') ->limit(10)
             ->get();
         $newWords->each(function ($newWord, $key){
             Log::info('word = '.json_encode($newWord));
             $wordGroups = $this->searchWordGroup($newWord->word);
-            $wordGroups = collect($wordGroups);
-            $wordGroups->filter(function($wordGroup, $key) use ($newWord){
-                return strpos($wordGroup, $newWord->word);
-            })->each(function($wordGroup, $key){
-                MWordGroup::where('word_group', $wordGroup)->delete();
+            if($wordGroups){
+                $wordGroups = collect($wordGroups);
+                $wordGroups->filter(function($wordGroup, $key) use ($newWord){
+                    return strpos($wordGroup, $newWord->word);
+                })->each(function($wordGroup, $key){
+                    MWordGroup::where('word_group', $wordGroup)->delete();
 
-                $newWordGroup = new MWordGroup();
-                $newWordGroup->word_group = $wordGroup;
-                list($grade, $term) = $this->computeGradeAndTerm($wordGroup);
-                $newWordGroup->grade = $grade;
-                $newWordGroup->term = $term;
-                $newWordGroup->save();
-            });
-            sleep(2);
+                    $newWordGroup = new MWordGroup();
+                    $newWordGroup->word_group = $wordGroup;
+                    list($grade, $term) = $this->computeGradeAndTerm($wordGroup);
+                    $newWordGroup->grade = $grade;
+                    $newWordGroup->term = $term;
+                    $newWordGroup->save();
+                });
+                sleep(2);
+            }
         });
         return 'success';
     }
@@ -51,7 +50,7 @@ class WordGroupRepository extends BaseRepository
         if(preg_match_all($pattern, $wordGroup, $matches)){
             Log::info('$matches  ='.json_encode($matches));
             $newWords = collect( $matches[0] );
-            $newWords->each(function($item, $key) use ($grade, $term,$wordGroup){
+            $newWords->each(function($item, $key) use (&$grade, &$term,$wordGroup){
                $newWord = MNewWord::where('word', $item)
                    ->first();
                if($newWord){
@@ -69,6 +68,25 @@ class WordGroupRepository extends BaseRepository
         return array($grade, $term);
     }
 
+    //调用梁斌分词，过滤乱七八糟的词组
+    public function splitWord($words){
+        $client = new Client([
+            'base_uri' => 'http://api.pullword.com/',
+            'timeout'  => 5.0,
+        ]);
+        $url = 'http://api.pullword.com/get.php?source='.urlencode(implode(',', $words)).' &param1=0.5&param2=0';
+        $response =  $client->request('GET', $url);
+        $code = $response->getStatusCode();
+        if($code==200){
+            $body = $response->getBody();
+            $pattern = '/[\x{4e00}-\x{9fa5}].*/u';
+            if(preg_match_all($pattern, $body, $matches)){
+                //Log::info('$matches = '.json_encode($matches));
+                return $matches[0];
+            }
+            return null;
+        }
+    }
     //调用百度汉语，查找词组
     public function searchWordGroup($word){
         $client = new Client([
@@ -76,7 +94,6 @@ class WordGroupRepository extends BaseRepository
             'timeout'  => 5.0,
         ]);
         $url = 'https://hanyu.baidu.com/s?wd='.urlencode($word).'&from=zici';
-
         $response =  $client->request('GET', $url);
         $code = $response->getStatusCode();
         if($code==200){
@@ -84,8 +101,9 @@ class WordGroupRepository extends BaseRepository
             //Log::info('$word = '.$word.', body = '.$body);
             $pinyinPattern = '/<a href=".*ptype=term">([\x{4e00}-\x{9fa5}].*)<\/a>/u';
             if(preg_match_all($pinyinPattern, $body, $matches)){
-                return $matches[1];
+                return $this->splitWord($matches[1]);
             }
+            return null;
         }
         else{
             throw new Exception('$word = '.$word.' error, $code = '.$code);
