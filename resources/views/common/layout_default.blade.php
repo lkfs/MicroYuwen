@@ -29,6 +29,8 @@
 
 @yield('content', '没有内容')
 
+@include("common/includeWaitingBox")
+@include("common/includeModal")
 <script src="{{ config('app.cdn_path') }}/jquery/1.12.4/jquery.min.js"></script>
 <script src="{{ config('app.cdn_path') }}/vue/vue.min.js"></script>
 <script src="{{ config('app.cdn_path') }}/jquery-validate/1.16.0/jquery.validate.min.js"></script>

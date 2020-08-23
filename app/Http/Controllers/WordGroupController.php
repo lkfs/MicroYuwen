@@ -103,6 +103,10 @@ class WordGroupController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $this->repository->delete($id);
+        return array(
+            'code'=>1,
+            'message'=>'success'
+        );
     }
 }

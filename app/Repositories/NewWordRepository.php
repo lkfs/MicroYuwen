@@ -330,17 +330,33 @@ class NewWordRepository extends BaseRepository
         }
     }
 
-    public function getWords($grade, $term){
+    /**
+     * @param $grade
+     * @param $term
+     * @param bool $write 听写模式
+     * @return mixed
+     */
+    public function getWords($grade, $term, $write=true){
         $newWords = MNewWord::where('grade', $grade)
             ->where('term', $term)
             ->get();
-        $newWords = $newWords->map(function($newWord, $key){
+        $newWords = $newWords->map(function($newWord, $key) use ($write){
             $wordGroups = MWordGroup::where("word_group", 'like', '%'.$newWord->word.'%')
-                ->get()
-                ->implode('word_group', ', ');
+                ->orderBy('grade')
+                ->orderBy('term')
+                ->limit(10)
+                ->get();
+            if($write){
+                $wordGroups = $wordGroups->map(function ($wordGroup, $key) use ($newWord){
+                    $wordGroup->word_group_wrap = str_replace($newWord->word, $newWord->pinyin, $wordGroup->word_group);
+                    return $wordGroup;
+                });
+                $newWord->word_wrap = '';
+            }
             $newWord->word_groups = $wordGroups;
             return $newWord;
         });
+        //dd($newWords->toArray());
         return $newWords;
     }
 
