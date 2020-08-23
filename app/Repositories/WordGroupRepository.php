@@ -48,7 +48,7 @@ class WordGroupRepository extends BaseRepository
         return 'success';
     }
 
-    public function computeGradeAndTerm($wordGroup)
+    private function computeGradeAndTerm($wordGroup)
     {
         $pattern = '/[\x{4e00}-\x{9fa5}]/u';
         $grade = -1;
@@ -75,7 +75,7 @@ class WordGroupRepository extends BaseRepository
     }
 
     //调用梁斌分词，过滤乱七八糟的词组
-    public function splitWord($words)
+    private function checkWord($words)
     {
         Log::info('fenci = ' . implode(',', $words));
         $client = new Client([
@@ -98,12 +98,12 @@ class WordGroupRepository extends BaseRepository
         } catch (Exception $e) {
             Log::info('sleep 60 seconds');
             sleep(60);
-            return $this->splitWord($words);
+            return $this->checkWord($words);
         }
     }
 
     //调用百度汉语，查找词组
-    public function searchWordGroup($word)
+    private function searchWordGroup($word)
     {
         Log::info('baidu = ' . $word);
         $client = new Client([
@@ -118,7 +118,7 @@ class WordGroupRepository extends BaseRepository
                 $body = $response->getBody();
                 $pinyinPattern = '/<a href=".*ptype=term">([\x{4e00}-\x{9fa5}].*)<\/a>/u';
                 if (preg_match_all($pinyinPattern, $body, $matches)) {
-                    return $this->splitWord($matches[1]);
+                    return $this->checkWord($matches[1]);
                 }
                 return null;
             } else {
@@ -129,6 +129,39 @@ class WordGroupRepository extends BaseRepository
             sleep(60);
             return $this->searchWordGroup($word);
         }
+    }
+
+    /**
+     * 词组拆分为单字，便于拼音标注
+     */
+    public function split()
+    {
+        $pattern = '/[\x{4e00}-\x{9fa5}]/u';
+        $newWords = MNewWord::orderBy('grade')
+            ->orderBy('term')
+            ->get();
+        $wordGroups = MWordGroup::orderBy('grade')
+            ->orderBy('term')
+            ->get();
+        $wordGroups->each(function ($item, $key) use ($pattern, $newWords){
+            if (preg_match_all($pattern, $item->word_group, $matches)) {
+                $split_json = array();
+                foreach ($matches[0] as $word){
+                    $new_word = $newWords->where('word', $word)->first();
+                    $split_json[$word] = array(
+                        'grade'=>$new_word->grade,
+                        'term'=>$new_word->term,
+                        'pinyin'=>$new_word->pinyin,
+                    );
+                }
+                Log::info(json_encode($split_json));
+                MWordGroup::where('word_group', $item->word_group)
+                    ->update(
+                        array('split_json'=>json_encode($split_json))
+                    );
+            }
+        });
+
     }
 
     public function delete($word_group){

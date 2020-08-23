@@ -15,6 +15,7 @@ use stdClass;
 class NewWordRepository extends BaseRepository
 {
     public $newWords;
+
     /**
      * NewWords constructor.
      */
@@ -319,11 +320,11 @@ class NewWordRepository extends BaseRepository
         );
         //endregion
         $pinyinPattern = '/([\x{4e00}-\x{9fa5}])\((.*?)\)/u';
-        foreach ($this->newWords as $key=>$items){
+        foreach ($this->newWords as $key => $items) {
             $rtn = array();
-            foreach ($items as $item){
-                if(preg_match($pinyinPattern, $item, $matches)){
-                        $rtn[ $matches[1] ] = $matches[2];
+            foreach ($items as $item) {
+                if (preg_match($pinyinPattern, $item, $matches)) {
+                    $rtn[$matches[1]] = $matches[2];
                 }
             }
             $this->newWords[$key] = $rtn;
@@ -336,18 +337,24 @@ class NewWordRepository extends BaseRepository
      * @param bool $write 听写模式
      * @return mixed
      */
-    public function getWords($grade, $term, $write=true){
+    public function getWords($grade, $term, $write = true)
+    {
+        $pattern = '/[\x{4e00}-\x{9fa5}]/u';
+
         $newWords = MNewWord::where('grade', $grade)
             ->where('term', $term)
             ->get();
-        $newWords = $newWords->map(function($newWord, $key) use ($write){
-            $wordGroups = MWordGroup::where("word_group", 'like', '%'.$newWord->word.'%')
+        $newWords = $newWords->map(function ($newWord, $key) use ($write, $pattern) {
+            $wordGroups = MWordGroup::where("word_group", 'like', '%' . $newWord->word . '%')
                 ->orderBy('grade')
                 ->orderBy('term')
                 ->limit(10)
                 ->get();
-            if($write){
-                $wordGroups = $wordGroups->map(function ($wordGroup, $key) use ($newWord){
+            if ($write) {
+                $wordGroups = $wordGroups->map(function ($wordGroup, $key) use ($newWord, $pattern) {
+//                    if (preg_match_all($pattern, $wordGroup->word_group, $matches)) {
+//                        foreach ($matches[0] as $word){
+//                    }
                     $wordGroup->word_group_wrap = str_replace($newWord->word, $newWord->pinyin, $wordGroup->word_group);
                     return $wordGroup;
                 });
@@ -365,17 +372,18 @@ class NewWordRepository extends BaseRepository
      * @param $term
      * @return array
      */
-    public function filter($content, $term){
+    public function filter($content, $term)
+    {
         $pattern = '/[\x{4e00}-\x{9fa5}]|\w*|[\\pP]/u';
         $count = preg_match_all($pattern, $content, $matches);
-        if($count>0){
-            $newWords = array_map(function($word) use ($term){
+        if ($count > 0) {
+            $newWords = array_map(function ($word) use ($term) {
                 $object = new stdClass();
                 $object->body = $word;
                 //生字标注
-                foreach ($this->terms as $termId=>$termName){
-                    if($termId>=$term){
-                        if(array_key_exists($word, $this->newWords[$termId])){
+                foreach ($this->terms as $termId => $termName) {
+                    if ($termId >= $term) {
+                        if (array_key_exists($word, $this->newWords[$termId])) {
                             $object->pinyin = $this->newWords[$termId][$word]; //标注拼音
                             $object->termId = $termId; //标注学期
                         }
@@ -384,19 +392,18 @@ class NewWordRepository extends BaseRepository
                 return $object;
             }, $matches[0]);
 
-            $newWords = array_filter($newWords, function($item){
+            $newWords = array_filter($newWords, function ($item) {
                 return isset($item->pinyin);
             });
 
             $rtn = array();
-            foreach ($newWords as $word){
+            foreach ($newWords as $word) {
                 $rtn[$word->body] = $word;
             }
 
             //$newWords = array_unique($newWords, SORT_STRING );
             return $rtn;
-        }
-        else
+        } else
             return array();
     }
 
@@ -408,37 +415,38 @@ class NewWordRepository extends BaseRepository
      * @param $term
      * @return array
      */
-    public function filterGroup($content, $term){
+    public function filterGroup($content, $term)
+    {
         $groupResult = array();
         //$pattern = '/[\x{4e00}-\x{9fa5}]|\w*|[\\pP]/u';
         $wordPattern = '/[\x{4e00}-\x{9fa5}]/u';
         $groupPattern = '/[\x{4e00}-\x{9fa5}]+/u';
         $count = preg_match_all($groupPattern, $content, $groupMatches);
-        if($count>0){
+        if ($count > 0) {
             $all = array_unique($groupMatches[0]);
             $all = array_values($all);
-            foreach($all as $group){
+            foreach ($all as $group) {
                 $wordCount = preg_match_all($wordPattern, $group, $wordMatches);
-                if($wordCount>0){
+                if ($wordCount > 0) {
                     //逐字处理，如果是生字加注拼音
                     $hasNew = false;
-                    $newWords = array_map(function($word) use ($term, &$hasNew){
+                    $newWords = array_map(function ($word) use ($term, &$hasNew) {
                         $object = new stdClass();
                         $object->word = $word;
-                        foreach ($this->terms as $termId=>$termName){
-                            if($termId>=$term){
-                                if(array_key_exists($word, $this->newWords[$termId])){
+                        foreach ($this->terms as $termId => $termName) {
+                            if ($termId >= $term) {
+                                if (array_key_exists($word, $this->newWords[$termId])) {
                                     $object->pinyin = $this->newWords[$termId][$word]; //标注拼音
                                     $object->termId = $termId; //标注学期
                                     $hasNew = true;
-                                    unset( $this->newWords[$termId][$word] );
+                                    unset($this->newWords[$termId][$word]);
                                 }
                             }
                         }
                         return $object;
                     }, $wordMatches[0]);
 
-                    if($hasNew){
+                    if ($hasNew) {
                         //如果有生字，则记录该词组
                         $groupResult[$group] = $newWords;
                     }
@@ -447,10 +455,10 @@ class NewWordRepository extends BaseRepository
             //处理单字，如果该单字在其他词组中出现，则去除之
             $keys = array_keys($groupResult);
             $onlyWordPattern = '/^[\x{4e00}-\x{9fa5}]$/u'; //单一个字的词组
-            foreach ($keys as $key){
-                if(preg_match($onlyWordPattern, $key)){
-                    foreach ($keys as $keyItem){
-                        if($key!=$keyItem && strpos($keyItem, $key)!==false){
+            foreach ($keys as $key) {
+                if (preg_match($onlyWordPattern, $key)) {
+                    foreach ($keys as $keyItem) {
+                        if ($key != $keyItem && strpos($keyItem, $key) !== false) {
                             unset($groupResult[$key]);
                             break;
                         }
@@ -459,8 +467,7 @@ class NewWordRepository extends BaseRepository
             }
 
             return $groupResult;
-        }
-        else
+        } else
             return array();
     }
 
@@ -472,32 +479,32 @@ class NewWordRepository extends BaseRepository
         $a = file('/home/vagrant/abb.local/newword.txt');
         $start = false;
         $newWords = new NewWordRepository();
-        foreach($a as $line => $content){
+        foreach ($a as $line => $content) {
             $pattern = '/([一二三四五六]年级[上下]册)生字/u';
             $count = preg_match($pattern, $content, $matches);
-            if($count>0){
+            if ($count > 0) {
                 $term = $matches[1];
                 $terms = array_flip($newWords->terms);
-                if($start){
-                    echo ');'."<br>";
+                if ($start) {
+                    echo ');' . "<br>";
                 }
                 $key = $terms[$term];
-                echo '$this->newWords['.$key.'] = array('."<br>";
+                echo '$this->newWords[' . $key . '] = array(' . "<br>";
                 $start = true;
             }
 
             $pattern = '/[\x{4e00}-\x{9fa5}]\(.*?\)/u';
             $count = preg_match_all($pattern, $content, $matches);
-            if($count>0){
+            if ($count > 0) {
                 $rtn = '';
-                foreach ($matches[0] as $matche){
-                    $rtn .= '\''.$matche.'\', ';
+                foreach ($matches[0] as $matche) {
+                    $rtn .= '\'' . $matche . '\', ';
                 }
-                echo $rtn."<br>";
+                echo $rtn . "<br>";
             }
         }
-        if($start){
-            echo ');'."<br>";
+        if ($start) {
+            echo ');' . "<br>";
         }
     }
 

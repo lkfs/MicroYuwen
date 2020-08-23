@@ -4,9 +4,9 @@
 
 <Workspace>
 	<Local Expanded="Yes">
-		<Model Expanded="Yes" ID="{35B3B502-6D8C-4611-B829-9D2E56A865E7}" Name="yuwen" Type="{1E597170-9350-11D1-AB3C-0020AF71E433}" URL="yuwen.cdm"/>
+		<Model Expanded="Yes" ID="{35B3B502-6D8C-4611-B829-9D2E56A865E7}" Name="yuwen" Selected="Yes" Type="{1E597170-9350-11D1-AB3C-0020AF71E433}" URL="yuwen.cdm"/>
 		<Model Expanded="Yes" ID="{518C468B-DF4A-4BAB-AEF1-89B008977E79}" Loaded="No" Name="yuwen" Type="{CDE44E21-9669-11D1-9914-006097355D9B}" URL="yuwen.pdm"/>
-		<Model Expanded="Yes" ID="{518C468B-DF4A-4BAB-AEF1-89B008977E79}" Name="yuwen" Selected="Yes" Type="{CDE44E21-9669-11D1-9914-006097355D9B}" URL="/php_workspace/MicroYuwen/doc/db/yuwen.pdm"/>
+		<Model Expanded="Yes" ID="{518C468B-DF4A-4BAB-AEF1-89B008977E79}" Loaded="No" Name="yuwen" Type="{CDE44E21-9669-11D1-9914-006097355D9B}" URL="/php_workspace/MicroYuwen/doc/db/yuwen.pdm"/>
 	</Local>
 	<BrowserModule Name="Repository"/>
 </Workspace>

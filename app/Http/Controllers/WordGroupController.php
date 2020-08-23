@@ -69,7 +69,7 @@ class WordGroupController extends Controller
      */
     public function show($id)
     {
-        //
+        return $this->repository->split();
     }
 
     /**
