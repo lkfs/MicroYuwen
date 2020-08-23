@@ -3,6 +3,7 @@
 
 namespace App\Repositories;
 
+use App\Models\MNewWord;
 use Illuminate\Support\Facades\Log;
 use stdClass;
 
@@ -18,6 +19,7 @@ class NewWordRepository extends BaseRepository
      */
     public function __construct()
     {
+        parent::__construct();
         $this->newWords[10] = array(
             '一(yī)', '二(èr)', '三(sān)',
             '十(shí)', '木(mù)', '禾(hé)',
@@ -325,6 +327,16 @@ class NewWordRepository extends BaseRepository
             }
             $this->newWords[$key] = $rtn;
         }
+    }
+
+    public function getWords($grade, $term){
+        $newWords = MNewWord::where('grade', $grade)
+            ->where('term', $term)
+            ->get();
+        $newWords->each(function($word, $key){
+
+        });
+        return $newWords;
     }
 
     /**

@@ -23,7 +23,26 @@ class NewWordController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
+    {
+        $grade = $request->get('grade', 4);
+        $term = $request->get('term', 0);
+        $data = $this->repository->getWords($grade, $term);
+        return view("new_words.new_word_index", array(
+            'grades'=>$this->repository->grades,
+            'terms'=>$this->repository->terms,
+            'curGrade'=>$grade,
+            'curTerm'=>$term,
+            'data'=>$data
+        ));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
     {
         /* 生词表入库
         foreach ($this->repository->newWords as $key=>$list){
@@ -37,15 +56,6 @@ class NewWordController extends Controller
                 $newWord->save();
             }
         }*/
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
         return view("new_words.new_words_edit", array(
             'grades'=>$this->repository->grades,
             'terms'=>$this->repository->terms,

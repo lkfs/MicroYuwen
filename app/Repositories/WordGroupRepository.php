@@ -22,7 +22,7 @@ class WordGroupRepository extends BaseRepository
     public function make()
     {
         $newWords = MNewWord::orderBy('grade')
-            ->where('grade', '>=', 2)
+            ->where('word_id', '>=', 429)
             ->orderBy('term')//->limit(10)
             ->get();
         $newWords->each(function ($newWord, $key) {
