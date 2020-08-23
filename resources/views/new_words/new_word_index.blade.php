@@ -1,5 +1,21 @@
 @extends('common.layout_default')
 
+@section('css')
+    <style>
+        .boxMain {
+            display: flex;
+            flex-direction: row;
+        }
+        .boxLeft {
+            flex-direction: column ;
+        }
+        .boxRight {
+            flex-direction: row ;
+        }
+    </style>
+
+@endsection
+
 @section('content')
 
     <form action="/newWords/" method="post" class="form-horizontal" id="newWordsForm">
@@ -31,33 +47,21 @@
                 <label for="notes" class="col-xs-3 control-label">文章内容:</label>
                 <div class="col-xs-9">
                     @foreach($data as $word)
-                        <p>{{$word->pinyin}}</p>
-                        <p>{{$word->word}}</p>
+                        <div class="boxMain">
+                            <div class="boxLeft">
+
+                                <p>{{$word->pinyin}}</p>
+                                <p>{{$word->word}}</p>
+                            </div>
+                            <div class="boxRight">
+
+                                <p>{{$word->word_groups}}</p>
+                            </div>
+                        </div>
                     @endforeach
 
                 </div>
             </div>
-
-            <div class="form-group">
-                <div class="col-xs-3 col-xs-offset-3">
-                    <button type="submit">生词入库</button>
-                </div>
-                <div class="col-xs-6">
-                    <label class="radio-inline">
-                        <input type="radio" name="displayType" class="displayType" id="btnNewWords" value="0" checked> 生词表
-                    </label>
-                    <label class="radio-inline">
-                        <input type="radio" name="displayType" class="displayType" id="btnWrite" value="1"> 拼音听写
-                    </label>
-                </div>
-            </div>
-
-            @if(!empty($groups))
-                <p>生字表:</p>
-                <div class="row">
-
-                </div>
-            @endif
 
         </div>
     </form>

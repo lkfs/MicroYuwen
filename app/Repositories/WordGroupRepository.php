@@ -22,7 +22,7 @@ class WordGroupRepository extends BaseRepository
     public function make()
     {
         $newWords = MNewWord::orderBy('grade')
-            ->where('word_id', '>=', 429)
+            ->where('word_id', '>=', 681)
             ->orderBy('term')//->limit(10)
             ->get();
         $newWords->each(function ($newWord, $key) {
@@ -111,17 +111,23 @@ class WordGroupRepository extends BaseRepository
             'timeout' => 5.0,
         ]);
         $url = 'https://hanyu.baidu.com/s?wd=' . urlencode($word) . '&from=zici';
-        $response = $client->request('GET', $url);
-        $code = $response->getStatusCode();
-        if ($code == 200) {
-            $body = $response->getBody();
-            $pinyinPattern = '/<a href=".*ptype=term">([\x{4e00}-\x{9fa5}].*)<\/a>/u';
-            if (preg_match_all($pinyinPattern, $body, $matches)) {
-                return $this->splitWord($matches[1]);
+        try {
+            $response = $client->request('GET', $url);
+            $code = $response->getStatusCode();
+            if ($code == 200) {
+                $body = $response->getBody();
+                $pinyinPattern = '/<a href=".*ptype=term">([\x{4e00}-\x{9fa5}].*)<\/a>/u';
+                if (preg_match_all($pinyinPattern, $body, $matches)) {
+                    return $this->splitWord($matches[1]);
+                }
+                return null;
+            } else {
+                throw new Exception('$word = ' . $word . ' error, $code = ' . $code);
             }
-            return null;
-        } else {
-            throw new Exception('$word = ' . $word . ' error, $code = ' . $code);
+        } catch (Exception $e) {
+            Log::info('sleep 60 seconds for baidu');
+            sleep(60);
+            return $this->searchWordGroup($word);
         }
     }
 

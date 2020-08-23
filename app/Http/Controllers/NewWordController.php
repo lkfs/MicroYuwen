@@ -25,7 +25,7 @@ class NewWordController extends Controller
      */
     public function index(Request $request)
     {
-        $grade = $request->get('grade', 4);
+        $grade = $request->get('grade', 1);
         $term = $request->get('term', 0);
         $data = $this->repository->getWords($grade, $term);
         return view("new_words.new_word_index", array(

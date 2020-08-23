@@ -4,6 +4,7 @@
 namespace App\Repositories;
 
 use App\Models\MNewWord;
+use App\Models\MWordGroup;
 use Illuminate\Support\Facades\Log;
 use stdClass;
 
@@ -333,8 +334,12 @@ class NewWordRepository extends BaseRepository
         $newWords = MNewWord::where('grade', $grade)
             ->where('term', $term)
             ->get();
-        $newWords->each(function($word, $key){
-
+        $newWords = $newWords->map(function($newWord, $key){
+            $wordGroups = MWordGroup::where("word_group", 'like', '%'.$newWord->word.'%')
+                ->get()
+                ->implode('word_group', ', ');
+            $newWord->word_groups = $wordGroups;
+            return $newWord;
         });
         return $newWords;
     }
