@@ -164,8 +164,11 @@ class WordGroupRepository extends BaseRepository
 
     }
 
-    public function delete($word_group){
-        MWordGroup::where('word_group', 'like', $word_group.'%')->delete();
+    public function replace($raw_word_group, $new_word_group){
+        MWordGroup::where('word_group', 'like', $raw_word_group.'%')
+            ->update(
+                array('word_group'=>$new_word_group)
+            );
     }
 
 }

@@ -343,6 +343,7 @@ class NewWordRepository extends BaseRepository
 
         $newWords = MNewWord::where('grade', $grade)
             ->where('term', $term)
+            ->orderBy('word')
             ->get();
         $newWords = $newWords->map(function ($newWord, $key) use ($write, $pattern) {
             $wordGroups = MWordGroup::where("word_group", 'like', '%' . $newWord->word . '%')

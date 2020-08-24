@@ -109,4 +109,15 @@ class WordGroupController extends Controller
             'message'=>'success'
         );
     }
+
+    public function replace(Request $request)
+    {
+        $raw_word_group = $request->input('raw_word_group');
+        $new_word_group = $request->input('new_word_group');
+        $this->repository->replace($raw_word_group,$new_word_group);
+        return array(
+            'code'=>1,
+            'message'=>'success'
+        );
+    }
 }

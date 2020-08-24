@@ -86,26 +86,40 @@
                 </div>
                 <div class="boxRight">
                     @foreach($word->word_groups as $word_group)
-                        <a class="boxItem crudDelete" data-id_value="{{$word_group->word_group}}">{{$word_group->word_group_wrap ?? $word_group->word_group}}</a>
+                        <a class="boxItem crudReplace" data-word_group="{{$word_group->word_group}}">{{$word_group->word_group_wrap ?? $word_group->word_group}}</a>
                     @endforeach
                 </div>
             </div>
         @endforeach
 
     </div>
+    <div id="replace" class="hidden">
+        <form action="/wordGroups/replace" method="post" class="form-inline" id="wordGroupsForm">
+            <input type="hidden" name="_method" value="DELETE">
+            <input type="hidden" name="_token" value="{{csrf_token()}}">
+            <span>
+                确认替换
+                <input type="text" name="raw_word_group" class="raw_word_group" style="width: 50px" readonly>
+                为
+                <input type="text" name="new_word_group" style="width: 50px">
+                吗？
+            </span>
+        </form>
+    </div>
 @stop
 @section('javascript')
 <script>
-    crud.action = 'wordGroups';
-    crud.title = '词组';
     $(document).ready(function () {
+        $("body").on("click", "a.crudReplace", function () {
+            var word_group = $(this).data('word_group');
 
-        $('.boxItem').on('click', function () {
-            let wordGroup = $(this).data('id_value');
-            crud.title = wordGroup;
-            //alert(wordGroup);
-            //$.ajax()
-        })
+            var form = $("#replace").removeClass('hidden').clone()
+            $(form).find(".raw_word_group").val(word_group);
+            $("#myModal .modal-body").empty().append(form);
+            $('#myModal').modal('show');
+
+            return false;
+        });
     })
 </script>
 @append
