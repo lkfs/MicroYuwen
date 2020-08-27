@@ -68,9 +68,8 @@
                     </label>
                 </div>
                 <div class="form-group text-center">
-                    <button type="submit">
-                        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
-                    </button>
+                    <button type="submit">查询</button>
+                    <button type="button">追加单词</button>
                 </div>
             </div>
 
@@ -86,7 +85,7 @@
                 </div>
                 <div class="boxRight">
                     @foreach($word->word_groups as $word_group)
-                        <a class="boxItem crudReplace" data-word_group="{{$word_group->word_group}}">{{$word_group->word_group_wrap ?? $word_group->word_group}}</a>
+                        <a class="boxItem crudDelete" data-id_value="{{$word_group->word_group}}">{{$word_group->word_group_wrap ?? $word_group->word_group}}</a>
                     @endforeach
                 </div>
             </div>
@@ -110,16 +109,10 @@
 @section('javascript')
 <script>
     $(document).ready(function () {
-        $("body").on("click", "a.crudReplace", function () {
-            var word_group = $(this).data('word_group');
-
-            var form = $("#replace").removeClass('hidden').clone()
-            $(form).find(".raw_word_group").val(word_group);
-            $("#myModal .modal-body").empty().append(form);
-            $('#myModal').modal('show');
-
-            return false;
-        });
+        $('.boxItem').on('click', function () {
+            let wordGroup = $(this).data('id_value');
+            crud.title = wordGroup;
+        })
     })
 </script>
 @append

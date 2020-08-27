@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Repositories\WordGroupRepository;
+use App\Repositories\WordGroupV2Repository;
 use Illuminate\Console\Command;
 
 class handleWord extends Command
@@ -27,7 +27,7 @@ class handleWord extends Command
      *
      * @return void
      */
-    public function __construct(WordGroupRepository $_repository)
+    public function __construct(WordGroupV2Repository $_repository)
     {
         parent::__construct();
         $this->repository = $_repository;
