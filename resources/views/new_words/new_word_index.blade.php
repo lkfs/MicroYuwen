@@ -85,34 +85,32 @@
                 </div>
                 <div class="boxRight">
                     @foreach($word->word_groups as $word_group)
-                        <a class="boxItem crudDelete" data-id_value="{{$word_group->word_group}}">{{$word_group->word_group_wrap ?? $word_group->word_group}}</a>
+                        <a class="boxItem crudDelete" style="color: rgb(51,122,{{233-$word_group->excellent*50}})"
+                           data-id_value="{{$word_group->word_group}}">
+                            {{$word_group->word_group_wrap ?? $word_group->word_group}}
+                        </a>
                     @endforeach
                 </div>
             </div>
         @endforeach
-
     </div>
-    <div id="replace" class="hidden">
-        <form action="/wordGroups/replace" method="post" class="form-inline" id="wordGroupsForm">
-            <input type="hidden" name="_method" value="DELETE">
-            <input type="hidden" name="_token" value="{{csrf_token()}}">
-            <span>
-                确认替换
-                <input type="text" name="raw_word_group" class="raw_word_group" style="width: 50px" readonly>
-                为
-                <input type="text" name="new_word_group" style="width: 50px">
-                吗？
-            </span>
-        </form>
+    <div id="myModel">
+
     </div>
 @stop
 @section('javascript')
 <script>
+    crud.action = 'wordGroups';
     $(document).ready(function () {
         $('.boxItem').on('click', function () {
             let wordGroup = $(this).data('id_value');
             crud.title = wordGroup;
         })
+
+        $("body").on("click", ".t_hanzi", function () {
+            var word = $(this).data('content');
+            return crudBase("/"+crud.action+"/create?word="+(word||""));
+        });
     })
 </script>
 @append

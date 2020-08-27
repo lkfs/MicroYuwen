@@ -347,6 +347,7 @@ class NewWordRepository extends BaseRepository
             ->get();
         $newWords = $newWords->map(function ($newWord, $key) use ($write, $pattern) {
             $wordGroups = MWordGroup::where("word_group", 'like', '%' . $newWord->word . '%')
+                ->orderBy('excellent')
                 ->orderBy('grade')
                 ->orderBy('term')
                 ->limit(10)
@@ -357,6 +358,17 @@ class NewWordRepository extends BaseRepository
 //                        foreach ($matches[0] as $word){
 //                    }
                     $wordGroup->word_group_wrap = str_replace($newWord->word, $newWord->pinyin, $wordGroup->word_group);
+                    switch ($newWord->word){
+                        case '他';
+                            $wordGroup->word_group_wrap .= '(男)';
+                            break;
+                        case '她';
+                            $wordGroup->word_group_wrap .= '(女)';
+                            break;
+                        case '它';
+                            $wordGroup->word_group_wrap .= '(动物)';
+                            break;
+                    }
                     return $wordGroup;
                 });
                 $newWord->word_wrap = '';

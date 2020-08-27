@@ -8,45 +8,15 @@ use App\Models\MWordGroup;
 use Exception;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
-use stdClass;
 
 /**
  * 词组
  * @package App\Repositories
  */
-class WordGroupRepository extends BaseRepository
+class WordGroupV3Repository extends BaseRepository
 {
     private $splitServer = array('114.67.84.223', '120.26.6.172', '116.196.101.207');
     private $splitIndex = 0;
-
-    public function make()
-    {
-        $newWords = MNewWord::orderBy('grade')
-            ->where('word_id', '>=', 681)
-            ->orderBy('term')//->limit(10)
-            ->get();
-        $newWords->each(function ($newWord, $key) {
-            Log::info('word = ' . $newWord->word);
-            $wordGroups = $this->searchWordGroup($newWord->word);
-            if ($wordGroups) {
-                $wordGroups = collect($wordGroups);
-                $wordGroups->filter(function ($wordGroup, $key) use ($newWord) {
-                    return strpos($wordGroup, $newWord->word);
-                })->each(function ($wordGroup, $key) {
-                    MWordGroup::where('word_group', $wordGroup)->delete();
-
-                    $newWordGroup = new MWordGroup();
-                    $newWordGroup->word_group = $wordGroup;
-                    list($grade, $term) = $this->computeGradeAndTerm($wordGroup);
-                    $newWordGroup->grade = $grade;
-                    $newWordGroup->term = $term;
-                    $newWordGroup->save();
-                });
-                sleep(5);
-            }
-        });
-        return 'success';
-    }
 
     private function computeGradeAndTerm($wordGroup)
     {
@@ -77,12 +47,14 @@ class WordGroupRepository extends BaseRepository
     //调用梁斌分词，过滤乱七八糟的词组
     private function checkWord($words)
     {
-        Log::info('fenci = ' . implode(',', $words));
+        if (is_array($words)) $words = implode(',', $words);
+
+        Log::info('fenci = ' . $words);
         $client = new Client([
             'base_uri' => 'http://api.pullword.com/',
             'timeout' => 5.0,
         ]);
-        $url = 'http://' . $this->splitServer[$this->splitIndex++] . '/get.php?source=' . urlencode(implode(',', $words)) . ' &param1=0.5&param2=0';
+        $url = 'http://' . $this->splitServer[$this->splitIndex++] . '/get.php?source=' . urlencode($words) . ' &param1=0.8&param2=0';
         if ($this->splitIndex >= 3) $this->splitIndex = 0;
         try {
             $response = $client->request('GET', $url);
@@ -91,7 +63,12 @@ class WordGroupRepository extends BaseRepository
                 $body = $response->getBody();
                 $pattern = '/[\x{4e00}-\x{9fa5}].*/u';
                 if (preg_match_all($pattern, $body, $matches)) {
-                    return $matches[0];
+                    $result = $matches[0];
+                    foreach ($result as $key => $item) {
+                        $result[$key] = str_replace("\r", "", $item);
+
+                    }
+                    return $result;
                 }
                 return null;
             }
@@ -143,29 +120,33 @@ class WordGroupRepository extends BaseRepository
         $wordGroups = MWordGroup::orderBy('grade')
             ->orderBy('term')
             ->get();
-        $wordGroups->each(function ($item, $key) use ($pattern, $newWords){
+        $wordGroups->each(function ($item, $key) use ($pattern, $newWords) {
             if (preg_match_all($pattern, $item->word_group, $matches)) {
                 $split_json = array();
-                foreach ($matches[0] as $word){
+                foreach ($matches[0] as $word) {
                     $new_word = $newWords->where('word', $word)->first();
                     $split_json[$word] = array(
-                        'grade'=>$new_word->grade,
-                        'term'=>$new_word->term,
-                        'pinyin'=>$new_word->pinyin,
+                        'grade' => $new_word->grade,
+                        'term' => $new_word->term,
+                        'pinyin' => $new_word->pinyin,
                     );
                 }
                 Log::info(json_encode($split_json));
                 MWordGroup::where('word_group', $item->word_group)
                     ->update(
-                        array('split_json'=>json_encode($split_json))
+                        array('split_json' => json_encode($split_json))
                     );
             }
         });
 
     }
 
-    public function delete($word_group){
-        MWordGroup::where('word_group', $word_group)->delete();
+    public function replace($raw_word_group, $new_word_group)
+    {
+        MWordGroup::where('word_group', 'like', $raw_word_group . '%')
+            ->update(
+                array('word_group' => $new_word_group)
+            );
     }
 
 }

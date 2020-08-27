@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\MNewWord;
+use App\Models\MWordGroup;
 use App\Repositories\NewWordRepository;
 use App\Repositories\WordGroupRepository;
 use Illuminate\Http\Request;
@@ -45,9 +46,10 @@ class WordGroupController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        return $this->repository->make();
+        $word = $request->input('word');
+        return view("new_words.word_group_edit",['word'=>$word]);
     }
 
     /**
@@ -58,7 +60,29 @@ class WordGroupController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $word_group = $request->input('word_group');
+
+        $pattern = '/[\x{4e00}-\x{9fa5}]/u';
+
+        if (preg_match_all($pattern, $word_group, $matches)) {
+            Log::info('$matches  =' . json_encode($matches));
+            $words = collect($matches[0]);
+            if($words->count()>=2){
+                $m_word_group = new MWordGroup();
+                $m_word_group->word_group = $word_group;
+                $m_word_group->excellent = 3;
+                $m_word_group->save();
+                return array(
+                    'code'=>1,
+                    'message'=>'success'
+                );
+            }
+        }
+        return array(
+            'code'=>-1,
+            'message'=>'词组至少包含两个汉字'
+        );
+
     }
 
     /**
@@ -110,14 +134,4 @@ class WordGroupController extends Controller
         );
     }
 
-    public function replace(Request $request)
-    {
-        $raw_word_group = $request->input('raw_word_group');
-        $new_word_group = $request->input('new_word_group');
-        $this->repository->replace($raw_word_group,$new_word_group);
-        return array(
-            'code'=>1,
-            'message'=>'success'
-        );
-    }
 }
