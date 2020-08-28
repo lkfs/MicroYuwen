@@ -60,28 +60,8 @@ class WordController extends Controller
      */
     public function store(Request $request)
     {
-        $word_group = $request->input('word_group');
-
-        $pattern = '/[\x{4e00}-\x{9fa5}]/u';
-
-        if (preg_match_all($pattern, $word_group, $matches)) {
-            Log::info('$matches  =' . json_encode($matches));
-            $words = collect($matches[0]);
-            if($words->count()>=2){
-                $m_word_group = new MWord();
-                $m_word_group->word_group = $word_group;
-                $m_word_group->excellent = 3;
-                $m_word_group->save();
-                return array(
-                    'code'=>1,
-                    'message'=>'success'
-                );
-            }
-        }
-        return array(
-            'code'=>-1,
-            'message'=>'词组至少包含两个汉字'
-        );
+        $word = $request->input('word');
+        return $this->repository->add($word);
 
     }
 

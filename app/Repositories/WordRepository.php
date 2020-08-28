@@ -38,11 +38,47 @@ class WordRepository extends BaseRepository
     }
 
     /**
+     * 新增词组
+     * @param $word
+     * @return array
+     */
+    public function add($word){
+        if (preg_match_all($this->split_char_pattern, $word, $matches)) {
+            $words = collect($matches[0]);
+            if($words->count()>=2){
+                $word_wrap = $words->implode(',');
+                $word_db = MWord::where('word', 'like', $word_wrap)->first();
+                if($word_db){
+                    return array(
+                        'code'=>1,
+                        'message'=>'词组已存在'
+                    );
+                }
+                else{
+                    $m_word = new MWord();
+                    $m_word->word = $word_wrap;
+                    $m_word->pinyin = $this->toPinyin($m_word->word);
+                    $m_word->excellent = 3;
+                    $m_word->save();
+                    return array(
+                        'code'=>1,
+                        'message'=>'success'
+                    );
+                }
+            }
+        }
+        return array(
+            'code'=>-1,
+            'message'=>'词组至少包含两个汉字'
+        );
+    }
+
+    /**
      * 标注
      * @param $char
      */
     public function toPinyin($word){
-        if (preg_match_all($this->split_char_pattern, $word->word, $matches)) {
+        if (preg_match_all($this->split_char_pattern, $word, $matches)) {
             $result = array();
             $chars = $matches[0];
             foreach ($chars as $char){
@@ -59,7 +95,7 @@ class WordRepository extends BaseRepository
                         $result[] = $default;
                 }
             }
-            echo 'to pinyin, word = '.$word->word.', pinyin = '.implode(',',$result)."\n";
+            echo 'to pinyin, word = '.$word.', pinyin = '.implode(',',$result)."\n";
             return implode(',',$result);
         }
         echo 'to pinyin, $word = '.$word."\n";
@@ -75,7 +111,7 @@ class WordRepository extends BaseRepository
             ->orderBy('term')
             ->get();
         $words->each(function ($word, $key) {
-            $word->pinyin = $this->toPinyin($word);
+            $word->pinyin = $this->toPinyin($word->word);
             //echo json_encode($word)."\n";
             $word->save();
         });

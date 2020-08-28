@@ -49,7 +49,7 @@
 
 @section('content')
 
-    <form action="/newWords/" method="get" class="form-inline" id="newWordsForm">
+    <form action="/newWords/" method="get" class="form-inline">
         <div class="container">
             <div class="">
                 <div class="form-group ">
