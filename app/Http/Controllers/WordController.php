@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\MNewWord;
-use App\Models\MWordGroup;
-use App\Repositories\NewWordRepository;
-use App\Repositories\WordGroupRepository;
+use App\Models\MChar;
+use App\Models\MWord;
+use App\Repositories\CharRepository;
+use App\Repositories\WordRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
-class WordGroupController extends Controller
+class WordController extends Controller
 {
     private $repository;
     /**
      * NewWordsController constructor.
      */
-    public function __construct(WordGroupRepository $_repository)
+    public function __construct(WordRepository $_repository)
     {
         $this->repository = $_repository;
     }
@@ -68,7 +68,7 @@ class WordGroupController extends Controller
             Log::info('$matches  =' . json_encode($matches));
             $words = collect($matches[0]);
             if($words->count()>=2){
-                $m_word_group = new MWordGroup();
+                $m_word_group = new MWord();
                 $m_word_group->word_group = $word_group;
                 $m_word_group->excellent = 3;
                 $m_word_group->save();

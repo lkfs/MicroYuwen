@@ -3,8 +3,8 @@
 
 namespace App\Repositories;
 
-use App\Models\MNewWord;
-use App\Models\MWordGroup;
+use App\Models\MChar;
+use App\Models\MWord;
 use Exception;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
@@ -45,9 +45,9 @@ class WordGroupV2Repository extends BaseRepository
             $items = explode(',', $item);
 
             foreach ($items as $wordGroup){
-                $found = MWordGroup::where('word_group', $wordGroup)->first();
+                $found = MWord::where('word_group', $wordGroup)->first();
                 if(!$found){
-                    $newWordGroup = new MWordGroup();
+                    $newWordGroup = new MWord();
                     $newWordGroup->word_group = $wordGroup;
                     //list($grade, $term) = $this->computeGradeAndTerm($wordGroup);
                     $newWordGroup->grade = $grade;
@@ -79,15 +79,15 @@ class WordGroupV2Repository extends BaseRepository
 
         $content = explode(' ', $this->content);
         foreach ($content as $item) {
-            $found = MWordGroup::where("word_group", $item)->first();
+            $found = MWord::where("word_group", $item)->first();
             if (!$found) {
-                $wordGroup = new MWordGroup();
+                $wordGroup = new MWord();
                 $wordGroup->word_group = $item;
                 $wordGroup->save();
             }
         }
         return;
-        $newWords = MNewWord::orderBy('grade')
+        $newWords = MChar::orderBy('grade')
             ->where('word_id', '>=', 681)
             ->orderBy('term')//->limit(10)
             ->get();
@@ -99,9 +99,9 @@ class WordGroupV2Repository extends BaseRepository
                 $wordGroups->filter(function ($wordGroup, $key) use ($newWord) {
                     return strpos($wordGroup, $newWord->word);
                 })->each(function ($wordGroup, $key) {
-                    MWordGroup::where('word_group', $wordGroup)->delete();
+                    MWord::where('word_group', $wordGroup)->delete();
 
-                    $newWordGroup = new MWordGroup();
+                    $newWordGroup = new MWord();
                     $newWordGroup->word_group = $wordGroup;
                     list($grade, $term) = $this->computeGradeAndTerm($wordGroup);
                     $newWordGroup->grade = $grade;
@@ -123,7 +123,7 @@ class WordGroupV2Repository extends BaseRepository
             Log::info('$matches  =' . json_encode($matches));
             $newWords = collect($matches[0]);
             $newWords->each(function ($item, $key) use (&$grade, &$term, $wordGroup) {
-                $newWord = MNewWord::where('word', $item)
+                $newWord = MChar::where('word', $item)
                     ->first();
                 if ($newWord) {
                     if (($grade * 10 + $term) < ($newWord->grade * 10 + $newWord->term)) {
@@ -210,10 +210,10 @@ class WordGroupV2Repository extends BaseRepository
     public function split()
     {
         $pattern = '/[\x{4e00}-\x{9fa5}]/u';
-        $newWords = MNewWord::orderBy('grade')
+        $newWords = MChar::orderBy('grade')
             ->orderBy('term')
             ->get();
-        $wordGroups = MWordGroup::orderBy('grade')
+        $wordGroups = MWord::orderBy('grade')
             ->orderBy('term')
             ->get();
         $wordGroups->each(function ($item, $key) use ($pattern, $newWords) {
@@ -228,7 +228,7 @@ class WordGroupV2Repository extends BaseRepository
                     );
                 }
                 Log::info(json_encode($split_json));
-                MWordGroup::where('word_group', $item->word_group)
+                MWord::where('word_group', $item->word_group)
                     ->update(
                         array('split_json' => json_encode($split_json))
                     );
@@ -239,7 +239,7 @@ class WordGroupV2Repository extends BaseRepository
 
     public function replace($raw_word_group, $new_word_group)
     {
-        MWordGroup::where('word_group', 'like', $raw_word_group . '%')
+        MWord::where('word_group', 'like', $raw_word_group . '%')
             ->update(
                 array('word_group' => $new_word_group)
             );

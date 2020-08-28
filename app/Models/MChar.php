@@ -9,11 +9,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
-class MArticle extends Model
+class MChar extends Model
 {
-    protected $table ='m_article';
+    protected $table ='m_char';
+    protected $primaryKey = 'chr_id';
     public $timestamps = true;
     protected $dates = ['deleted_at'];
 

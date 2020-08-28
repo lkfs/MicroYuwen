@@ -3,8 +3,8 @@
 
 namespace App\Repositories;
 
-use App\Models\MNewWord;
-use App\Models\MWordGroup;
+use App\Models\MChar;
+use App\Models\MWord;
 use Illuminate\Support\Facades\Log;
 use stdClass;
 
@@ -12,7 +12,7 @@ use stdClass;
  * 生字表
  * @package App\Repositories
  */
-class NewWordRepository extends BaseRepository
+class CharRepository extends BaseRepository
 {
     public $newWords;
 
@@ -337,48 +337,45 @@ class NewWordRepository extends BaseRepository
      * @param bool $write 听写模式
      * @return mixed
      */
-    public function getWords($grade, $term, $write = true)
+    public function getChars($grade, $term, $write = true)
     {
         $pattern = '/[\x{4e00}-\x{9fa5}]/u';
 
-        $newWords = MNewWord::where('grade', $grade)
+        $chars = MChar::where('grade', $grade)
             ->where('term', $term)
-            ->orderBy('word')
+            ->orderBy('chr')
             ->get();
-        $newWords = $newWords->map(function ($newWord, $key) use ($write, $pattern) {
-            $wordGroups = MWordGroup::where("word_group", 'like', '%' . $newWord->word . '%')
+        $chars = $chars->map(function ($char, $key) use ($write, $pattern) {
+            $words = MWord::where("word", 'like', '%' . $char->word . '%')
                 ->orderBy('excellent')
                 ->orderBy('grade')
                 ->orderBy('term')
                 ->limit(10)
                 ->get();
             if ($write) {
-                $wordGroups = $wordGroups->map(function ($wordGroup, $key) use ($newWord, $pattern) {
-//                    if (preg_match_all($pattern, $wordGroup->word_group, $matches)) {
-//                        foreach ($matches[0] as $word){
-//                    }
-                    $wordGroup->word_group = str_replace(',', '', $wordGroup->word_group);
-                    $wordGroup->word_group_wrap = str_replace($newWord->word, $newWord->pinyin, $wordGroup->word_group);
-                    switch ($newWord->word){
+                $words = $words->map(function ($word, $key) use ($char, $pattern) {
+                    $word->word = str_replace(',', '', $word->word);
+                    $word->word_wrap = str_replace($char->chr, $char->pinyin, $word->word);
+                    switch ($char->word){
                         case '他';
-                            $wordGroup->word_group_wrap .= '(男)';
+                            $word->word_group_wrap .= '(男)';
                             break;
                         case '她';
-                            $wordGroup->word_group_wrap .= '(女)';
+                            $word->word_group_wrap .= '(女)';
                             break;
                         case '它';
-                            $wordGroup->word_group_wrap .= '(动物)';
+                            $word->word_group_wrap .= '(动物)';
                             break;
                     }
-                    return $wordGroup;
+                    return $word;
                 });
-                $newWord->word_wrap = '';
+                $char->word_wrap = '';
             }
-            $newWord->word_groups = $wordGroups;
-            return $newWord;
+            $char->word_groups = $words;
+            return $char;
         });
         //dd($newWords->toArray());
-        return $newWords;
+        return $chars;
     }
 
     /**
@@ -492,7 +489,7 @@ class NewWordRepository extends BaseRepository
     {
         $a = file('/home/vagrant/abb.local/newword.txt');
         $start = false;
-        $newWords = new NewWordRepository();
+        $newWords = new CharRepository();
         foreach ($a as $line => $content) {
             $pattern = '/([一二三四五六]年级[上下]册)生字/u';
             $count = preg_match($pattern, $content, $matches);

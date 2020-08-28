@@ -3,8 +3,8 @@
 
 namespace App\Repositories;
 
-use App\Models\MNewWord;
-use App\Models\MWordGroup;
+use App\Models\MChar;
+use App\Models\MWord;
 use Exception;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
@@ -216,12 +216,12 @@ eof;
             $word = explode("：",$word);
             $group = explode("、",$group);
             //生字入库
-            $newWord = MNewWord::where('word',$word[0])
+            $newWord = MChar::where('word',$word[0])
                 ->where('pinyin',$word[1])
                 ->first();
             echo $word[0].'-'.$word[1]."\n";
             if($newWord==null){
-                $newWord = new MNewWord();
+                $newWord = new MChar();
                 $newWord->word = $word[0];
                 $newWord->pinyin = $word[1];
             }
@@ -247,7 +247,7 @@ eof;
             Log::info('$matches  =' . json_encode($matches));
             $newWords = collect($matches[0]);
             $newWords->each(function ($item, $key) use (&$grade, &$term, $wordGroup) {
-                $newWord = MNewWord::where('word', $item)
+                $newWord = MChar::where('word', $item)
                     ->first();
                 if ($newWord) {
                     if (($grade * 10 + $term) < ($newWord->grade * 10 + $newWord->term)) {
@@ -334,10 +334,10 @@ eof;
     public function split()
     {
         $pattern = '/[\x{4e00}-\x{9fa5}]/u';
-        $newWords = MNewWord::orderBy('grade')
+        $newWords = MChar::orderBy('grade')
             ->orderBy('term')
             ->get();
-        $wordGroups = MWordGroup::orderBy('grade')
+        $wordGroups = MWord::orderBy('grade')
             ->orderBy('term')
             ->get();
         $wordGroups->each(function ($item, $key) use ($pattern, $newWords) {
@@ -353,7 +353,7 @@ eof;
                         $pinyin_flag = 0;
                     }
                 }
-                MWordGroup::where('word_group', $item->word_group)
+                MWord::where('word_group', $item->word_group)
                     ->update(
                         array(
                             'word_group' => implode(',',$matches[0] ),

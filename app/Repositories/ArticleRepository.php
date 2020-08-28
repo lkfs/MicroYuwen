@@ -3,7 +3,7 @@
 
 namespace App\Repositories;
 
-use App\Models\MNewWord;
+use App\Models\MChar;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
 use stdClass;

@@ -2,18 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\MNewWord;
-use App\Repositories\NewWordRepository;
+use App\Repositories\CharRepository;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
-class NewWordController extends Controller
+class CharController extends Controller
 {
     private $repository;
     /**
      * NewWordsController constructor.
      */
-    public function __construct(NewWordRepository $_repository)
+    public function __construct(CharRepository $_repository)
     {
         $this->repository = $_repository;
     }
@@ -27,7 +25,7 @@ class NewWordController extends Controller
     {
         $grade = $request->get('grade', 1);
         $term = $request->get('term', 0);
-        $data = $this->repository->getWords($grade, $term);
+        $data = $this->repository->getChars($grade, $term);
         return view("new_words.new_word_index", array(
             'grades'=>$this->repository->grades,
             'terms'=>$this->repository->terms,

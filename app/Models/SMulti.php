@@ -9,12 +9,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
-class MWordGroup extends Model
+class SMulti extends Model
 {
-    protected $table ='m_word_group';
-    protected $primaryKey ='group_id';
+    protected $table ='s_multi';
+    protected $primaryKey = 'chr_id';
     public $timestamps = true;
     protected $dates = ['deleted_at'];
 
