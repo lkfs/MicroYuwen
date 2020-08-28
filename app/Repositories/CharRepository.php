@@ -340,6 +340,7 @@ class CharRepository extends BaseRepository
     public function getChars($grade, $term, $write = true)
     {
         $chars = MChar::where('grade', $grade)
+            //->where('chr', '倒')
             ->where('term', $term)
             ->orderBy('chr')
             ->get();

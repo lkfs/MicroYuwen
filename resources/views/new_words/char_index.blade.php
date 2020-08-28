@@ -100,7 +100,7 @@
 @stop
 @section('javascript')
 <script>
-    crud.action = 'wordGroups';
+    crud.action = 'words';
     $(document).ready(function () {
         $('.boxItem').on('click', function () {
             let wordGroup = $(this).data('id_value');

@@ -49,7 +49,7 @@ class WordController extends Controller
     public function create(Request $request)
     {
         $word = $request->input('word');
-        return view("new_words.word_group_edit",['word'=>$word]);
+        return view("new_words.word_edit",['word'=>$word]);
     }
 
     /**
