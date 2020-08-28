@@ -6,7 +6,7 @@
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
             <input type="hidden" name="_method" value="POST">
             <div class="form-group">
-               <input type="text" name="word" value="{{$word ?? ''}}" class="form-control" id="word_group">
+               <input type="text" name="word" value="{{$word ?? ''}}" class="form-control">
             </div>
         </div>
     </form>
