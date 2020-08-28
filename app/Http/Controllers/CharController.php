@@ -26,7 +26,7 @@ class CharController extends Controller
         $grade = $request->get('grade', 1);
         $term = $request->get('term', 0);
         $data = $this->repository->getChars($grade, $term);
-        return view("new_words.new_word_index", array(
+        return view("new_words.char_index", array(
             'grades'=>$this->repository->grades,
             'terms'=>$this->repository->terms,
             'curGrade'=>$grade,

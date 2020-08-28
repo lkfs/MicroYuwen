@@ -339,39 +339,49 @@ class CharRepository extends BaseRepository
      */
     public function getChars($grade, $term, $write = true)
     {
-        $pattern = '/[\x{4e00}-\x{9fa5}]/u';
-
         $chars = MChar::where('grade', $grade)
             ->where('term', $term)
             ->orderBy('chr')
             ->get();
-        $chars = $chars->map(function ($char, $key) use ($write, $pattern) {
-            $words = MWord::where("word", 'like', '%' . $char->word . '%')
+        $chars = $chars->map(function ($char, $key) use ($write) {
+            $words = MWord::where("word", 'like', '%' . $char->chr . '%')
                 ->orderBy('excellent')
                 ->orderBy('grade')
                 ->orderBy('term')
                 ->limit(10)
                 ->get();
             if ($write) {
-                $words = $words->map(function ($word, $key) use ($char, $pattern) {
-                    $word->word = str_replace(',', '', $word->word);
-                    $word->word_wrap = str_replace($char->chr, $char->pinyin, $word->word);
-                    switch ($char->word){
+                $words = $words->map(function ($item, $key) use ($char) {
+                    $words = explode(',',$item->word);
+                    $pinyins = explode(',',$item->pinyin);
+                    $item->word = str_replace(',', '', $item->word);
+                    //dd([$char, $words, $pinyins]);
+                    foreach ($words as $k=>$w){
+                        if($w==$char->chr){
+                            if(isset($pinyins[$k]))
+                                $words[$k] = $pinyins[$k];
+                            else
+                                $words[$k] = '?';
+                        }
+                    }
+
+                    $item->word_wrap = implode('', $words);
+                    switch ($char->chr){
                         case '他';
-                            $word->word_group_wrap .= '(男)';
+                            $item->word_wrap .= '(男)';
                             break;
                         case '她';
-                            $word->word_group_wrap .= '(女)';
+                            $item->word_wrap .= '(女)';
                             break;
                         case '它';
-                            $word->word_group_wrap .= '(动物)';
+                            $item->word_wrap .= '(动物)';
                             break;
                     }
-                    return $word;
+                    return $item;
                 });
-                $char->word_wrap = '';
+                $char->chr_wrap = '';
             }
-            $char->word_groups = $words;
+            $char->words = $words;
             return $char;
         });
         //dd($newWords->toArray());
