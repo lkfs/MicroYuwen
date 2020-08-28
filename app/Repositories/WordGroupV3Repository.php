@@ -219,15 +219,14 @@ eof;
             $newWord = MNewWord::where('word',$word[0])
                 ->where('pinyin',$word[1])
                 ->first();
+            echo $word[0].'-'.$word[1]."\n";
             if($newWord==null){
-                echo $word[0].'-'.$word[1]."\n";
                 $newWord = new MNewWord();
                 $newWord->word = $word[0];
                 $newWord->pinyin = $word[1];
             }
             $newWord->multi_flag =1;
             $newWord->save();
-
             //单词入库
 
             //dd([$word, $group]);
