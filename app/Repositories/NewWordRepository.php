@@ -357,6 +357,7 @@ class NewWordRepository extends BaseRepository
 //                    if (preg_match_all($pattern, $wordGroup->word_group, $matches)) {
 //                        foreach ($matches[0] as $word){
 //                    }
+                    $wordGroup->word_group = str_replace(',', '', $wordGroup->word_group);
                     $wordGroup->word_group_wrap = str_replace($newWord->word, $newWord->pinyin, $wordGroup->word_group);
                     switch ($newWord->word){
                         case '他';

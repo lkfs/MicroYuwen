@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Repositories\WordGroupV2Repository;
+use App\Repositories\WordGroupV3Repository;
 use Illuminate\Console\Command;
 
 class handleWord extends Command
@@ -27,7 +27,7 @@ class handleWord extends Command
      *
      * @return void
      */
-    public function __construct(WordGroupV2Repository $_repository)
+    public function __construct(WordGroupV3Repository $_repository)
     {
         parent::__construct();
         $this->repository = $_repository;
@@ -40,6 +40,6 @@ class handleWord extends Command
      */
     public function handle()
     {
-        return $this->repository->make();
+        return $this->repository->muti_input();
     }
 }

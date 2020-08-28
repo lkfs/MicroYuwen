@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class MNewWord extends Model
 {
     protected $table ='m_new_word';
-    protected $id ='word_id';
+    protected $primaryKey = 'word_id';
     public $timestamps = true;
     protected $dates = ['deleted_at'];
 

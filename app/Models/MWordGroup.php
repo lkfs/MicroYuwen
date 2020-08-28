@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class MWordGroup extends Model
 {
     protected $table ='m_word_group';
-    protected $id ='group_id';
+    protected $primaryKey ='group_id';
     public $timestamps = true;
     protected $dates = ['deleted_at'];
 
