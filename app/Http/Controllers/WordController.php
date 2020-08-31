@@ -27,18 +27,8 @@ class WordController extends Controller
      */
     public function index()
     {
-        /* 生词表入库
-        foreach ($this->repository->newWords as $key=>$list){
-            foreach ($list as $word=>$pinyin){
-                $newWord = new MNewWord();
-                $newWord->word = $word;
-                $newWord->pinyin = $pinyin;
-                $newWord->grade = floor($key / 10);
-                $newWord->term = $key % 10;
-                Log::info('$word = '.$newWord.', $pinyin = '.$pinyin.json_encode($newWord));
-                $newWord->save();
-            }
-        }*/
+       $words = MWord::where('pinyin', 'like', '%|%')->get();
+        return view("word.word_index",['data'=>$words]);
     }
 
     /**
@@ -49,7 +39,7 @@ class WordController extends Controller
     public function create(Request $request)
     {
         $word = $request->input('word');
-        return view("new_words.word_edit",['word'=>$word]);
+        return view("char.word_edit",['word'=>$word]);
     }
 
     /**

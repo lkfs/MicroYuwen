@@ -17,3 +17,4 @@ Route::get('/', function () {
 
 Route::resource('chars', 'CharController');
 Route::resource('words', 'WordController');
+Route::resource('wordMultis', 'WordMultiController');

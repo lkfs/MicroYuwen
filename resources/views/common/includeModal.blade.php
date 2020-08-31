@@ -24,11 +24,6 @@
         </div>
     </div>
 </div>
-{{--显示大图--}}
-<div id="showBigImg" class="hidden">
-    <img src="/images/1cz.jpg"/>
-</div>
-
 
 
 

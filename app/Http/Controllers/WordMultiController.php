@@ -2,16 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MChar;
+use App\Models\MWord;
 use App\Repositories\CharRepository;
+use App\Repositories\WordRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
-class CharController extends Controller
+/**
+ * 词组，多音标注
+ * Class WordMultiController
+ * @package App\Http\Controllers
+ */
+class WordMultiController extends Controller
 {
     private $repository;
     /**
      * NewWordsController constructor.
      */
-    public function __construct(CharRepository $_repository)
+    public function __construct(WordRepository $_repository)
     {
         $this->repository = $_repository;
     }
@@ -21,18 +30,18 @@ class CharController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
-        $grade = $request->get('grade', 1);
-        $term = $request->get('term', 0);
-        $data = $this->repository->getChars($grade, $term);
-        return view("char.char_index", array(
-            'grades'=>$this->repository->grades,
-            'terms'=>$this->repository->terms,
-            'curGrade'=>$grade,
-            'curTerm'=>$term,
-            'data'=>$data
-        ));
+        $words = MWord::where('pinyin', 'like', '%|%')->limit(12)->get();
+        $words = $words->map(function ($item, $key){
+            $pinyin = collect( explode(',',$item->pinyin) );
+            $pinyin = $pinyin->map(function($i,$k){
+                return collect( explode('|', $i) );
+            });
+            $item->pinyin = $pinyin;
+            return $item;
+        });
+        return view("word_multi.word_multi_index",['data'=>$words]);
     }
 
     /**
@@ -40,24 +49,8 @@ class CharController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        /* 生词表入库
-        foreach ($this->repository->newWords as $key=>$list){
-            foreach ($list as $word=>$pinyin){
-                $newWord = new MNewWord();
-                $newWord->word = $word;
-                $newWord->pinyin = $pinyin;
-                $newWord->grade = floor($key / 10);
-                $newWord->term = $key % 10;
-                Log::info('$word = '.$newWord.', $pinyin = '.$pinyin.json_encode($newWord));
-                $newWord->save();
-            }
-        }*/
-        return view("new_words.new_words_edit", array(
-            'grades'=>$this->repository->grades,
-            'terms'=>$this->repository->terms,
-        ));
     }
 
     /**
@@ -68,7 +61,7 @@ class CharController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
     }
 
     /**
@@ -79,7 +72,6 @@ class CharController extends Controller
      */
     public function show($id)
     {
-        //
     }
 
     /**
@@ -102,7 +94,15 @@ class CharController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+
+        $word = MWord::find($id);
+        $word->pinyin = $request->input('pinyin');
+        $word->save();
+
+        return array(
+            'code'=>1,
+            'message'=>'success'
+        );
     }
 
     /**
@@ -113,6 +113,11 @@ class CharController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $this->repository->delete($id);
+        return array(
+            'code'=>1,
+            'message'=>'success'
+        );
     }
+
 }

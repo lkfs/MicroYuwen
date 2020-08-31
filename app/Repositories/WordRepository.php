@@ -73,6 +73,17 @@ class WordRepository extends BaseRepository
         );
     }
 
+
+    public function delete($word){
+        if (preg_match_all($this->split_char_pattern, $word, $matches)) {
+            $word = implode(',', $matches);
+            MWord::where('word', 'like', $word)->delete();
+            return array(
+                'code' => 1,
+                'message' => 'success'
+            );
+        }
+    }
     /**
      * 标注
      * @param $char
@@ -95,7 +106,7 @@ class WordRepository extends BaseRepository
                         $result[] = $default;
                 }
             }
-            echo 'to pinyin, word = '.$word.', pinyin = '.implode(',',$result)."\n";
+            //echo 'to pinyin, word = '.$word.', pinyin = '.implode(',',$result)."\n";
             return implode(',',$result);
         }
         echo 'to pinyin, $word = '.$word."\n";
