@@ -76,7 +76,7 @@ class WordRepository extends BaseRepository
 
     public function delete($word){
         if (preg_match_all($this->split_char_pattern, $word, $matches)) {
-            $word = implode(',', $matches);
+            $word = implode(',', $matches[0]);
             MWord::where('word', 'like', $word)->delete();
             return array(
                 'code' => 1,

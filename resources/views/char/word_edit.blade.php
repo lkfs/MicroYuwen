@@ -6,7 +6,7 @@
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
             <input type="hidden" name="_method" value="POST">
             <div class="form-group">
-               <input type="text" name="word" value="{{$word ?? ''}}" class="form-control">
+               <input type="text" name="word" value="{{$word ?? ''}}" class="form-control" id="word_input">
             </div>
         </div>
     </form>
@@ -15,6 +15,10 @@
     <form >
     <script>
         $(document).ready(function () {
+            //$("#word_input").focus();
+            setTimeout(function () {
+                $("#word_input").focus().select();
+            }, 500);
             $("#wordForm").validate({
                 submitHandler: function(form) {
                     $(form).ajaxSubmit({
