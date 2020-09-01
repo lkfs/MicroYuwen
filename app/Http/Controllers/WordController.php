@@ -51,6 +51,7 @@ class WordController extends Controller
     public function store(Request $request)
     {
         $word = $request->input('word');
+
         return $this->repository->add($word);
 
     }

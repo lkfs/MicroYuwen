@@ -29,11 +29,11 @@ class WordRepository extends BaseRepository
      */
     public function __construct()
     {
-        $this->pinyin_total = Cache::remember("pinyin_total", 10, function(){
-            return  SPinYin::get();
+        $this->pinyin_total = Cache::remember("pinyin_total", 10, function () {
+            return SPinYin::get();
         });
-        $this->multi_total = Cache::remember("multi_total", 10, function(){
-            return  SMulti::get();
+        $this->multi_total = Cache::remember("multi_total", 10, function () {
+            return SMulti::get();
         });
     }
 
@@ -42,39 +42,45 @@ class WordRepository extends BaseRepository
      * @param $word
      * @return array
      */
-    public function add($word){
-        if (preg_match_all($this->split_char_pattern, $word, $matches)) {
-            $words = collect($matches[0]);
-            if($words->count()>=2){
-                $word_wrap = $words->implode(',');
-                $word_db = MWord::where('word', 'like', $word_wrap)->first();
-                if($word_db){
-                    return array(
-                        'code'=>1,
-                        'message'=>'词组已存在'
-                    );
+    public function add($word)
+    {
+        $words = explode('|', $word);
+        foreach ($words as $word) {
+            if (preg_match_all($this->split_char_pattern, $word, $matches)) {
+                $words = collect($matches[0]);
+                if ($words->count() >= 2) {
+                    $word_wrap = $words->implode(',');
+                    $word_db = MWord::where('word', 'like', $word_wrap)->first();
+                    if ($word_db) {
+                        return array(
+                            'code' => 1,
+                            'message' => '词组已存在 '.$word
+                        );
+                    } else {
+                        $m_word = new MWord();
+                        $m_word->word = $word_wrap;
+                        $m_word->pinyin = $this->toPinyin($m_word->word);
+                        $m_word->excellent = 3;
+                        $m_word->save();
+                    }
                 }
-                else{
-                    $m_word = new MWord();
-                    $m_word->word = $word_wrap;
-                    $m_word->pinyin = $this->toPinyin($m_word->word);
-                    $m_word->excellent = 3;
-                    $m_word->save();
-                    return array(
-                        'code'=>1,
-                        'message'=>'success'
-                    );
-                }
+            }
+            else{
+                return array(
+                    'code' => -1,
+                    'message' => '词组至少包含两个汉字'
+                );
             }
         }
         return array(
-            'code'=>-1,
-            'message'=>'词组至少包含两个汉字'
+            'code' => 1,
+            'message' => 'success'
         );
     }
 
 
-    public function delete($word){
+    public function delete($word)
+    {
         if (preg_match_all($this->split_char_pattern, $word, $matches)) {
             $word = implode(',', $matches[0]);
             MWord::where('word', 'like', $word)->delete();
@@ -84,41 +90,43 @@ class WordRepository extends BaseRepository
             );
         }
     }
+
     /**
      * 标注
      * @param $char
      */
-    public function toPinyin($word){
+    public function toPinyin($word)
+    {
         if (preg_match_all($this->split_char_pattern, $word, $matches)) {
             $result = array();
             $chars = $matches[0];
-            foreach ($chars as $char){
+            foreach ($chars as $char) {
                 $pinyin = $this->pinyin_total->where('chr', $char);
-                if($pinyin->count()==1){
+                if ($pinyin->count() == 1) {
                     $result[] = $pinyin->first()->duyin;
-                }
-                else {
+                } else {
                     $default = $pinyin->first()->duyin;
                     $pinyin = $this->multi_total->where('chr', $char);
-                    if($pinyin->count()>0)
+                    if ($pinyin->count() > 0)
                         $result[] = $pinyin->implode('duyin', '|');
                     else
                         $result[] = $default;
                 }
             }
             //echo 'to pinyin, word = '.$word.', pinyin = '.implode(',',$result)."\n";
-            return implode(',',$result);
+            return implode(',', $result);
         }
-        echo 'to pinyin, $word = '.$word."\n";
+        echo 'to pinyin, $word = ' . $word . "\n";
         return '';
     }
+
     /**
      * 词组拆分为单字，便于拼音标注
      */
     public function batchMark()
     {
         $words = MWord::orderBy('grade')
-           // ->where('word', 'like', '不%可%')
+            // ->where('word', 'like', '不%可%')
             ->orderBy('term')
             ->get();
         $words->each(function ($word, $key) {
@@ -132,22 +140,22 @@ class WordRepository extends BaseRepository
     private $multi = <<<eof
 eof;
 
-    public function multi(){
+    public function multi()
+    {
         $rows = explode("\n", $this->multi);
-        foreach ($rows as $row){
+        foreach ($rows as $row) {
             $row = explode('：', $row);
             $char = $row[0];
             $pinyin = $row[1];
-            $multi = SMulti::where('chr', $char)->where('duyin',$pinyin)->get();
-            if(!$multi){
+            $multi = SMulti::where('chr', $char)->where('duyin', $pinyin)->get();
+            if (!$multi) {
                 $multi = new SMulti();
                 $multi->chr = $char;
                 $multi->duyin = $pinyin;
                 $multi->save();
-                echo $multi->chr.' - '.$multi->duyin."\n";
-            }
-            else{
-                echo $char.' - '.$pinyin." 已存在\n";
+                echo $multi->chr . ' - ' . $multi->duyin . "\n";
+            } else {
+                echo $char . ' - ' . $pinyin . " 已存在\n";
             }
         }
     }
