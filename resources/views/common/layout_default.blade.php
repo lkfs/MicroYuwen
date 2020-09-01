@@ -39,9 +39,9 @@
 <script src="{{ config('app.cdn_path') }}/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script src="{{ config('app.cdn_path') }}/bootstrap-treeview/1.2.0/bootstrap-treeview.min.js"></script>
 <script src="{{ config('app.cdn_path') }}/bootstrap-switch/3.3.4/js/bootstrap-switch.min.js"></script>
-<script src="{{asset('style/jquery-validation-1.16.0/localization/messages_zh.min.js').'?'.time()}}"></script>
-<script src="{{asset('style/public.js').'?'.time()}}"></script>
-<script src="{{asset('style/crud.js').'?'.time()}}"></script>
+<script src="{{asset('style/jquery-validation-1.16.0/localization/messages_zh.min.js', false).'?'.time()}}"></script>
+<script src="{{asset('style/public.js', false).'?'.time()}}"></script>
+<script src="{{asset('style/crud.js', false).'?'.time()}}"></script>
 <script src="{{ config('app.cdn_path') }}/socket.io/2.0.3/socket.io.js"></script>
 <script type="text/javascript">
     var WEBSOCKET_URL = "{{env('WEBSOCKET_URL')}}";
