@@ -27,10 +27,10 @@ class handleWord extends Command
      *
      * @return void
      */
-    public function __construct(WordRepository $_repository)
+    public function __construct()
     {
         parent::__construct();
-        $this->repository = $_repository;
+        //$this->repository = $_repository;
     }
 
     /**
@@ -40,6 +40,10 @@ class handleWord extends Command
      */
     public function handle()
     {
-        return $this->repository->batchMark();
+        $a = 'g';
+        $b = 'ɡ';
+        echo $a.' '.ord($a)."\n";
+        echo $b.' '.ord($b)."\n";
+        //return $this->repository->batchMark();
     }
 }

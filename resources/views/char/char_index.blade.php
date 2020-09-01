@@ -69,7 +69,6 @@
                 </div>
                 <div class="form-group text-center">
                     <button type="submit">查询</button>
-                    <button type="button">追加单词</button>
                 </div>
             </div>
 
