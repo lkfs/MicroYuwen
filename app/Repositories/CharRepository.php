@@ -5,6 +5,7 @@ namespace App\Repositories;
 
 use App\Models\MChar;
 use App\Models\MWord;
+use App\Utils\DBUtil;
 use Illuminate\Support\Facades\Log;
 use stdClass;
 
@@ -339,13 +340,13 @@ class CharRepository extends BaseRepository
      */
     public function getChars($grade, $term, $write = true)
     {
-        $chars = MChar::where('grade', $grade)
-            //->where('chr', '倒')
-            ->where('term', $term)
+        DBUtil::printSQL();
+        $chars = MChar::where('chr', '重')
             ->orderBy('chr')
             ->get();
         $chars = $chars->map(function ($char, $key) use ($write) {
             $words = MWord::where("word", 'like', '%' . $char->chr . '%')
+                ->where("pinyin", 'like', '%' . trim($char->pinyin) . '%')
                 ->orderBy('excellent')
                 ->orderBy('grade')
                 ->orderBy('term')
