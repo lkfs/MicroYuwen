@@ -352,7 +352,7 @@ class CharRepository extends BaseRepository
                 ->orderBy('excellent')
                 ->orderBy('grade')
                 ->orderBy('term')
-                ->limit(10)
+                ->limit(8)
                 ->get();
             if ($write) {
                 $words = $words->map(function ($item, $key) use ($char) {
