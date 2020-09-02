@@ -21,7 +21,7 @@ class WordRepository extends BaseRepository
 {
     private $pinyin_total;
     private $multi_total;
-    private $split_char_pattern = '/[\x{4e00}-\x{9fa5}]/u';
+    private $split_char_pattern = '/[\x{4e00}-\x{9fa5}，]/u';
 
     /**
      * WordRepository constructor.
@@ -46,6 +46,7 @@ class WordRepository extends BaseRepository
     {
         $words = explode('|', $word);
         foreach ($words as $word) {
+            $word = str_replace(',', '，', $word);
             if (preg_match_all($this->split_char_pattern, $word, $matches)) {
                 $words = collect($matches[0]);
                 if ($words->count() >= 2) {
@@ -54,7 +55,7 @@ class WordRepository extends BaseRepository
                     if ($word_db) {
                         return array(
                             'code' => 1,
-                            'message' => '词组已存在 '.$word
+                            'message' => '词组已存在 ' . $word
                         );
                     } else {
                         $m_word = new MWord();
@@ -64,8 +65,7 @@ class WordRepository extends BaseRepository
                         $m_word->save();
                     }
                 }
-            }
-            else{
+            } else {
                 return array(
                     'code' => -1,
                     'message' => '词组至少包含两个汉字'
@@ -102,7 +102,10 @@ class WordRepository extends BaseRepository
             $chars = $matches[0];
             foreach ($chars as $char) {
                 $pinyin = $this->pinyin_total->where('chr', $char);
-                if ($pinyin->count() == 1) {
+                if ($pinyin->count() == 0) {
+                    $result[] = '';
+                }
+                else if ($pinyin->count() == 1) {
                     $result[] = $pinyin->first()->duyin;
                 } else {
                     $default = $pinyin->first()->duyin;
