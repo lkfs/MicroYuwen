@@ -7,41 +7,41 @@
             flex-wrap:wrap;
             flex-direction: row;
         }
-        .boxMain {
+        .charItem {
             width: 310px;
             display: flex;
             flex-direction: row;
         }
-        .boxLeft {
+        .charItem .charLeft {
             margin: 5px;
             display: flex;
             flex-direction: column ;
             width:50px;
             height:80px;
         }
-        .boxRight {
-            margin: 5px;
-            display: flex;
-            flex-direction: row ;
-            flex-wrap: wrap;
-        }
-        .boxItem {
-            margin: 3px 5px;
-        }
-        .t_pinyin{
+        .charItem .charLeft .charPinyin{
             width: 50px;
             height: 30px;
             border: solid #ACC0D8 1px;
             text-align: center;
             line-height:30px;
         }
-        .t_hanzi{
+        .charItem .charLeft .charHanzi{
             width: 50px;
             height: 50px;
             border: solid #ACC0D8 1px;
             border-top-width:0px;
             text-align: center;
             line-height:50px;
+        }
+        .charItem .charRight {
+            margin: 5px;
+            display: flex;
+            flex-direction: row ;
+            flex-wrap: wrap;
+        }
+        .charItem .charRight .wordItem {
+            margin: 3px 5px;
         }
     </style>
 
@@ -77,14 +77,14 @@
 
     <div class="content">
         @foreach($data as $chr)
-            <div class="boxMain">
-                <div class="boxLeft">
-                    <div class="t_pinyin">{{$chr->pinyin}}</div>
-                    <div class="t_hanzi" data-content="{{$chr->chr}}">{{$chr->chr_wrap ?? $chr->chr}}</div>
+            <div class="charItem">
+                <div class="charLeft">
+                    <div class="charPinyin">{{$chr->pinyin}}</div>
+                    <div class="charHanzi" data-content="{{$chr->chr}}">{{$chr->chr_wrap ?? $chr->chr}}</div>
                 </div>
-                <div class="boxRight">
+                <div class="charRight">
                     @foreach($chr->words as $word)
-                        <a class="boxItem crudDelete" style="color: rgb(51,122,{{233-$word->excellent*50}})"
+                        <a class="wordItem crudDelete" style="color: rgb(51,122,{{233-$word->excellent*50}})"
                            data-id_value="{{$word->word}}">
                             {{$word->word_wrap ?? $word->word}}
                         </a>
