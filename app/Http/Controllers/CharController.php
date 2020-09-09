@@ -30,7 +30,7 @@ class CharController extends Controller
         $term = $request->get('term', 0);
 
         $all = $request->all();
-        $all = array_unshift($all, $request->url());
+        array_unshift($all, $request->url());
         $key = md5(json_encode($all));
         Log::info('$grade = ' . $grade . ', $term = ' . $term . ',$key=' . $key . ', $all = ' . json_encode($all));
         $data = Cache::tags(['char', 'word'])->remember($key, 60 * 60 * 24, function () use ($grade, $term) {
