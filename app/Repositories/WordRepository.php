@@ -162,4 +162,40 @@ eof;
             }
         }
     }
+
+    public function handleGradeAndTerm(){
+        $words = MWord::get();
+        $words->each(function ($word, $key){
+            list($grade, $term) = $this->computeGradeAndTerm($word->word);
+            $word->grade = $grade;
+            $word->term = $term;
+            $word->save();
+            echo 'word = '.$word->word.', grade = '.$grade. ', term = '.$term. "\n";
+        });
+    }
+
+    private function computeGradeAndTerm($wordGroup)
+    {
+        $pattern = '/[\x{4e00}-\x{9fa5}]/u';
+        $grade = -1;
+        $term = -1;
+        if (preg_match_all($pattern, $wordGroup, $matches)) {
+            Log::info('$matches  =' . json_encode($matches));
+            $chars = collect($matches[0]);
+            $chars->each(function ($item, $key) use (&$grade, &$term, $wordGroup) {
+                $char = MChar::where('chr', $item)->first();
+                if ($char) {
+                    if (($grade * 10 + $term) < ($char->grade * 10 + $char->term)) {
+                        $grade = $char->grade;
+                        $term = $char->term;
+                    }
+                } else {
+                    Log::info('生僻字 = ' . $wordGroup);
+                    $grade = 9;
+                    $term = 9;
+                }
+            });
+        }
+        return array($grade, $term);
+    }
 }
