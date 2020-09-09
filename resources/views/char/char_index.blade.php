@@ -110,7 +110,7 @@
             crud.title = wordGroup;
         })
 
-        $("body").on("click", ".t_hanzi", function () {
+        $("body").on("click", ".charHanzi", function () {
             var word = $(this).data('content');
             return crudBase("/"+crud.action+"/create?word="+(word||""));
         });

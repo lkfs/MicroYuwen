@@ -349,9 +349,9 @@ class CharRepository extends BaseRepository
         $chars = $chars->map(function ($char, $key) use ($write) {
             $words = MWord::where("word", 'like', '%' . $char->chr . '%')
                 ->where("pinyin", 'like', '%' . trim($char->pinyin) . '%')
-                ->orderBy('excellent')
                 ->orderBy('grade')
                 ->orderBy('term')
+                ->orderBy('excellent')
                 ->limit(8)
                 ->get();
             if ($write) {

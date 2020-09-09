@@ -7,6 +7,7 @@ use App\Models\MWord;
 use App\Repositories\CharRepository;
 use App\Repositories\WordRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class WordController extends Controller
@@ -51,7 +52,7 @@ class WordController extends Controller
     public function store(Request $request)
     {
         $word = $request->input('word');
-
+        Cache::tags('word')->flush();
         return $this->repository->add($word);
 
     }
@@ -99,6 +100,7 @@ class WordController extends Controller
     public function destroy($id)
     {
         $this->repository->delete($id);
+        Cache::tags('word')->flush();
         return array(
             'code'=>1,
             'message'=>'success'

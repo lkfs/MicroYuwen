@@ -7,6 +7,7 @@ use App\Models\MWord;
 use App\Repositories\CharRepository;
 use App\Repositories\WordRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -94,11 +95,10 @@ class WordMultiController extends Controller
      */
     public function update(Request $request, $id)
     {
-
         $word = MWord::find($id);
         $word->pinyin = $request->input('pinyin');
         $word->save();
-
+        Cache::tags('word')->flush();
         return array(
             'code'=>1,
             'message'=>'success'
@@ -114,6 +114,7 @@ class WordMultiController extends Controller
     public function destroy($id)
     {
         $this->repository->delete($id);
+        Cache::tags('word')->flush();
         return array(
             'code'=>1,
             'message'=>'success'

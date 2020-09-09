@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Repositories\CharRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class CharController extends Controller
 {
     private $repository;
+
     /**
      * NewWordsController constructor.
      */
@@ -30,16 +32,17 @@ class CharController extends Controller
         $all = $request->all();
         $all = array_unshift($all, $request->url());
         $key = md5($all);
-        $data = Cache::tags([$request->url()])->remember($key, 10, function () use ($grade, $term){
+        $data = Cache::tags(['char', 'word'])->remember($key, 60 * 60 * 24, function () use ($grade, $term) {
+            Log::info('提取生字表，grade = ' . $grade . ', term = ' . $term);
             $data = $this->repository->getChars($grade, $term);
             return $data;
-        } );
+        });
         return view("char.char_index", array(
-            'grades'=>$this->repository->grades,
-            'terms'=>$this->repository->terms,
-            'curGrade'=>$grade,
-            'curTerm'=>$term,
-            'data'=>$data
+            'grades' => $this->repository->grades,
+            'terms' => $this->repository->terms,
+            'curGrade' => $grade,
+            'curTerm' => $term,
+            'data' => $data
         ));
     }
 
@@ -63,15 +66,15 @@ class CharController extends Controller
             }
         }*/
         return view("new_words.new_words_edit", array(
-            'grades'=>$this->repository->grades,
-            'terms'=>$this->repository->terms,
+            'grades' => $this->repository->grades,
+            'terms' => $this->repository->terms,
         ));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -82,7 +85,7 @@ class CharController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -93,7 +96,7 @@ class CharController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -104,8 +107,8 @@ class CharController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
@@ -116,7 +119,7 @@ class CharController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
