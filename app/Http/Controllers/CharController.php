@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Repositories\CharRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class CharController extends Controller
 {
@@ -25,7 +26,14 @@ class CharController extends Controller
     {
         $grade = $request->get('grade', 1);
         $term = $request->get('term', 0);
-        $data = $this->repository->getChars($grade, $term);
+
+        $all = $request->all();
+        $all = array_unshift($all, $request->url());
+        $key = md5($all);
+        $data = Cache::tags([$request->url()])->remember($key, 10, function () use ($grade, $term){
+            $data = $this->repository->getChars($grade, $term);
+            return $data;
+        } );
         return view("char.char_index", array(
             'grades'=>$this->repository->grades,
             'terms'=>$this->repository->terms,
