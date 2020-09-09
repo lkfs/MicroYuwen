@@ -340,7 +340,7 @@ class CharRepository extends BaseRepository
      */
     public function getChars($grade, $term, $write = true)
     {
-        DBUtil::printSQL();
+        //DBUtil::printSQL();
         $chars = MChar::where('grade', $grade)
             ->where('term', $term)
             //->where('chr', '重')
