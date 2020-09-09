@@ -31,7 +31,8 @@ class CharController extends Controller
 
         $all = $request->all();
         $all = array_unshift($all, $request->url());
-        $key = md5($all);
+        $key = md5(json_encode($all));
+        Log::info('$grade = ' . $grade . ', $term = ' . $term . ',$key=' . $key . ', $all = ' . json_encode($all));
         $data = Cache::tags(['char', 'word'])->remember($key, 60 * 60 * 24, function () use ($grade, $term) {
             Log::info('提取生字表，grade = ' . $grade . ', term = ' . $term);
             $data = $this->repository->getChars($grade, $term);
