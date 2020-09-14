@@ -39,6 +39,7 @@
             border-top-width:0px;
             text-align: center;
             line-height:50px;
+            color: grey;
         }
         .charMain .charRight {
             height: 100px;
@@ -75,16 +76,19 @@
             </div>
             <div class="form-group text-center">
                 <button type="submit">查询</button>
+                <span>{{$data->count()}}字</span>
             </div>
         </div>
     </form>
 
     <div class="content">
-        @foreach($data as $chr)
+        @foreach($data as $k=>$chr)
             <div class="charMain">
                 <div class="charLeft">
                     <div class="charPinyin">{{$chr->pinyin}}</div>
-                    <div class="charHanzi" data-content="{{$chr->chr}}">{{$chr->chr_wrap ?? $chr->chr}}</div>
+                    <div class="charHanzi" data-content="{{$chr->chr}}">
+                        {{$k%20==19?($k+1):""}}
+                    </div>
                 </div>
                 <div class="charRight" style="width: {{($chr->words->count()/4+1)*80}}px">
                     @foreach($chr->words as $word)
