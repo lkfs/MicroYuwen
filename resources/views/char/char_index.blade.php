@@ -41,7 +41,7 @@
             line-height:50px;
         }
         .charMain .charRight {
-            height: 120px;
+            height: 100px;
             margin: 5px;
             display: flex;
             flex-direction: column ;
