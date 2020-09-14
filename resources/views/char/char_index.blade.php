@@ -41,10 +41,10 @@
             line-height:50px;
         }
         .charMain .charRight {
-            max-width: 250px;
+            height: 120px;
             margin: 5px;
             display: flex;
-            flex-direction: row ;
+            flex-direction: column ;
             flex-wrap: wrap;
         }
         .charMain .charRight .wordItem {
@@ -86,7 +86,7 @@
                     <div class="charPinyin">{{$chr->pinyin}}</div>
                     <div class="charHanzi" data-content="{{$chr->chr}}">{{$chr->chr_wrap ?? $chr->chr}}</div>
                 </div>
-                <div class="charRight">
+                <div class="charRight" style="width: {{($chr->words->count()/4+1)*70}}px">
                     @foreach($chr->words as $word)
                         <a class="wordItem crudDelete" style="color: rgb(51,122,{{$word->grade>=9?255:(233-$word->excellent*50)}})"
                            data-id_value="{{$word->word}}">
