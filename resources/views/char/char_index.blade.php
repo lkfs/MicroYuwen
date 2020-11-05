@@ -14,7 +14,7 @@
             flex-direction: row;
         }
         .charMain {
-            //width: 310px;
+            min-width: 310px;
             display: flex;
             flex-direction: row;
         }
